@@ -1,0 +1,57 @@
+Turbo Assembler	 Version 3.2	    09/19/24 15:12:09	    Page 1
+mrak.asm
+
+
+
+      1	0000			     .Model Small
+      2	0000			     .data
+      3	0000  0F ?? 0F*(??)	     OblVvoda	     db	     15,?,15 dup (?)
+      4	0011			     .code
+      5	0000			     UU:
+      6	0000  B8 0000s			     mov     ax,@data
+      7	0003  8E D8			     mov     ds,ax
+      8	0005  B4 0A			     mov     ah,10
+      9	0007  BA 0000r			     lea     dx,OblVvoda
+     10	000A  CD 21			     int     21h
+     11	000C  C6 06 000Cr 8F		     mov     OblVvoda+12,'è'
+     12	0011  C6 06 000Er 8F		     mov     OblVvoda+14,'è'
+     13	0016  B4 09			     mov     ah,9
+     14	0018  BA 0002r			     lea     DX,OblVvoda+2
+     15	001B  C6 06 0010r 24		     mov     OblVvoda+16,'$'
+     16	0020  CD 21			     int     21h
+     17	0022  B4 4C			     mov     ah,4ch
+     18	0024  CD 21			     int     21h
+     19					     end     UU
+Turbo Assembler	 Version 3.2	    09/19/24 15:12:09	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "09/19/24"
+??FILENAME			  Text	 "mrak	  "
+??TIME				  Text	 "15:12:09"
+??VERSION			  Number 0314
+@32BIT				  Text	 0
+@CODE				  Text	 _TEXT
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 MRAK
+@INTERFACE			  Text	 00H
+@MODEL				  Text	 2
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+OBLVVODA			  Byte	 DGROUP:0000
+UU				  Near	 _TEXT:0000
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0011 Word	  Public  DATA
+_TEXT				  16  0026 Word	  Public  CODE
+

@@ -1,0 +1,214 @@
+Microsoft (R) Macro Assembler (x64) Version 14.40.33812.0   10/06/24 13:13:56
+SampleJump.asm						     Page 1 - 1
+
+
+				extrn MessageBoxA: PROC
+				extrn ExitProcess:PROC
+				extrn CreateThread:PROC
+				extrn FindWindowA:PROC
+				extrn MoveWindow:PROC
+				extrn Sleep:PROC
+
+ 00000000			.data
+ 00000000 36 34 2D 62 69	caption             db      '64-bit hello', 0
+	   74 20 68 65 6C
+	   6C 6F 00
+ 0000000D 48 65 6C 6C 6F	message             db      'Hello, World!', 0
+	   2C 20 57 6F 72
+	   6C 64 21 00
+ 0000001B 00000000		HWINDOW             dword   ?
+ 0000001F 0000000A		SLEEP_DURATION      dword   10 
+ 00000023 000001C2		CURRENT_X           dword   450
+ 00000027 0000015E		CURRENT_Y           dword   350
+ 0000002B 00000000		new_x               dword   0
+ 0000002F 00000000		new_y               dword   0
+ 00000033 00000085		MSGBOX_WIDTH        dword   133               
+ 00000037 0000008C		MSGBOX_HEIGHT       dword   140               
+ 0000003B 000004E2		MAX_X               dword   1250              
+ 0000003F 00000258		MAX_Y               dword   600
+ 00000043 000003E8		const_X             dword   1000
+ 00000047 00000258		const_Y             dword   600
+ 0000004B 000001F4		const_sleep         dword   500
+
+ 00000000			.code
+
+ 00000000			Start proc
+ 00000000  48/ 83 EC 28		    sub rsp,28h 
+ 00000004  48/ C7 C1		    mov rcx, 0 
+	   00000000
+ 0000000B  48/ 8D 15		    lea rdx, message 
+	   0000000D R
+ 00000012  4C/ 8D 05		    lea r8, caption 
+	   00000000 R
+ 00000019  41/ B9		    mov r9d, 0 
+	   00000000
+ 0000001F  E8 00000000 E	    call MessageBoxA
+ 00000024  48/ 83 C4 28		    add rsp,28h
+
+				    ;CreateThread(0,0,Thread_Func, 0, 0, 0)
+ 00000028  48/ C7 C1		    mov RCX, 0           
+	   00000000
+ 0000002F  48/ C7 C2		    mov RDX, 0           
+	   00000000
+ 00000036  49/ B8		    mov R8,  Move 
+	   00000000000000B6 R
+ 00000040  49/ C7 C1		    mov R9,  0           
+	   00000000
+ 00000047  48/ 83 EC 0C		    sub RSP, 12          
+ 0000004B  48/ C7 04 24		    mov qword ptr [RSP], 0     
+	   00000000
+ 00000053  C7 44 24 08		    mov dword ptr [RSP + 8], 0 
+	   00000000
+ 0000005B  E8 00000000 E	    call CreateThread
+ 00000060  48/ 83 C4 0C		    add RSP, 12
+
+ 00000064  48/ 83 EC 28		    sub rsp,28h 
+ 00000068  C6 05 00000014 R	    mov message+7,'h'
+	   68
+ 0000006F  C6 05 00000015 R	    mov message+8, 'e'
+	   65
+ 00000076  C6 05 00000016 R	    mov message+9,'l'
+	   6C
+ 0000007D  C6 05 00000017 R	    mov message+10,'l'
+	   6C
+ 00000084  C6 05 00000018 R	    mov message+11,'!'
+	   21
+ 0000008B  C6 05 0000000B R	    mov caption+11,'!'
+	   21
+ 00000092  48/ C7 C1		    mov rcx, 0 
+	   00000000
+ 00000099  48/ 8D 15		    lea rdx, message
+	   0000000D R
+ 000000A0  4C/ 8D 05		    lea r8, caption
+	   00000000 R
+ 000000A7  41/ B9		    mov r9d, 0 
+	   00000000
+ 000000AD  E8 00000000 E	    call MessageBoxA
+ 000000B2  48/ 83 C4 28		    add rsp,28h 
+				    
+ 000000B6			Start endp
+
+ 000000B6			Move proc
+
+				;Find_WIndow(0,caption) return handler in EAX
+ 000000B6			FIND:
+ 000000B6  48/ C7 C1		    mov  RCX, 0              
+	   00000000
+ 000000BD  48/ 8D 15		    lea  RDX, [caption] 
+	   00000000 R
+ 000000C4  E8 00000000 E	    call FindWindowA    
+ 000000C9  48/ 83 F8 00		    cmp  RAX, 0
+ 000000CD  74 E7		    je FIND
+
+ 000000CF  89 05 0000001B R	    mov [HWINDOW], EAX
+
+ 000000D5			new_coord:
+ 000000D5  BA 00000000		    mov edx, 0
+ 000000DA  66| 0F C7 F0		    rdrand AX
+ 000000DE  F7 35 00000043 R	    div const_X
+ 000000E4  8B C2		    mov eax, edx
+ 000000E6  89 05 0000002B R	    mov new_x , eax
+				  
+ 000000EC  BA 00000000		    mov edx, 0
+ 000000F1  66| 0F C7 F0		    rdrand AX
+ 000000F5  F7 35 00000047 R	    div const_Y
+ 000000FB  8B C2		    mov eax, edx
+ 000000FD  89 05 0000002F R	    mov new_y, eax
+				  
+ 00000103  BA 00000000		    mov edx, 0
+ 00000108  66| 0F C7 F0		    rdrand AX
+ 0000010C  F7 35 0000004B R	    div const_sleep
+ 00000112  8B C2		    mov eax, edx
+ 00000114  83 C0 01		    add eax, 1
+ 00000117  89 05 0000001F R	    mov SLEEP_DURATION, eax
+				  
+ 0000011D			LP_MOVE:
+				    ; Sleep(SLEEP_DURATION)
+ 0000011D  8B 0D 0000001F R	    mov ECX, [SLEEP_DURATION]
+ 00000123  E8 00000000 E	    call Sleep
+
+				    ; Генерация новых случайных координат для хаотичного перемещения
+ 00000128  BA 00000000		    mov edx, 0
+ 0000012D  66| 0F C7 F0		    rdrand AX
+ 00000131  F7 35 00000043 R	    div const_X
+ 00000137  8B C2		    mov eax, edx
+ 00000139  89 05 00000023 R	    mov CURRENT_X, eax
+
+ 0000013F  BA 00000000		    mov edx, 0
+ 00000144  66| 0F C7 F0		    rdrand AX
+ 00000148  F7 35 00000047 R	    div const_Y
+ 0000014E  8B C2		    mov eax, edx
+ 00000150  89 05 00000027 R	    mov CURRENT_Y, eax
+
+ 00000156			MOOVE_WINDOW:
+				    ; MoveWindow(HWINDOW,Current_x,Current_Y,MSGBOX_Width, MSGBOX_Height, 1)
+ 00000156  8B 0D 0000001B R	    mov ECX, [HWINDOW]
+ 0000015C  8B 15 00000023 R	    mov EDX, CURRENT_X
+ 00000162  44/ 8B 05		    mov R8D, CURRENT_Y
+	   00000027 R
+ 00000169  44/ 8B 0D		    mov R9D, [MSGBOX_WIDTH]
+	   00000033 R
+ 00000170  8B 05 00000037 R	    mov EAX, [MSGBOX_HEIGHT]
+ 00000176  89 44 24 20		    mov dword ptr [RSP+20h], EAX
+ 0000017A  C7 44 24 28		    mov dword ptr [RSP+28h], 1
+	   00000001
+ 00000182  E8 00000000 E	    call MoveWindow
+
+ 00000187  83 F8 00		    cmp EAX, 0
+ 0000018A  75 91		    jne LP_MOVE
+
+ 0000018C  48/ C7 C1		    mov RCX, 0   
+	   00000000
+ 00000193  EB 00		    jmp exit_p
+
+ 00000195			exit_p:
+ 00000195  E8 00000000 E	  call ExitProcess
+ 0000019A			Move endp
+				End
+Microsoft (R) Macro Assembler (x64) Version 14.40.33812.0   10/06/24 13:13:56
+SampleJump.asm						     Symbols 2 - 1
+
+
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+Move . . . . . . . . . . . . . .	P 	 000000B6 _TEXT	Length= 000000E4 Public
+  FIND . . . . . . . . . . . . .	L 	 000000B6 _TEXT	
+  new_coord  . . . . . . . . . .	L 	 000000D5 _TEXT	
+  LP_MOVE  . . . . . . . . . . .	L 	 0000011D _TEXT	
+  MOOVE_WINDOW . . . . . . . . .	L 	 00000156 _TEXT	
+  exit_p . . . . . . . . . . . .	L 	 00000195 _TEXT	
+Start  . . . . . . . . . . . . .	P 	 00000000 _TEXT	Length= 000000B6 Public
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+CURRENT_X  . . . . . . . . . . .	DWord	 00000023 _DATA	
+CURRENT_Y  . . . . . . . . . . .	DWord	 00000027 _DATA	
+CreateThread . . . . . . . . . .	L 	 00000000 External
+ExitProcess  . . . . . . . . . .	L 	 00000000 External
+FindWindowA  . . . . . . . . . .	L 	 00000000 External
+HWINDOW  . . . . . . . . . . . .	DWord	 0000001B _DATA	
+MAX_X  . . . . . . . . . . . . .	DWord	 0000003B _DATA	
+MAX_Y  . . . . . . . . . . . . .	DWord	 0000003F _DATA	
+MSGBOX_HEIGHT  . . . . . . . . .	DWord	 00000037 _DATA	
+MSGBOX_WIDTH . . . . . . . . . .	DWord	 00000033 _DATA	
+MessageBoxA  . . . . . . . . . .	L 	 00000000 External
+MoveWindow . . . . . . . . . . .	L 	 00000000 External
+SLEEP_DURATION . . . . . . . . .	DWord	 0000001F _DATA	
+Sleep  . . . . . . . . . . . . .	L 	 00000000 External
+caption  . . . . . . . . . . . .	Byte	 00000000 _DATA	
+const_X  . . . . . . . . . . . .	DWord	 00000043 _DATA	
+const_Y  . . . . . . . . . . . .	DWord	 00000047 _DATA	
+const_sleep  . . . . . . . . . .	DWord	 0000004B _DATA	
+message  . . . . . . . . . . . .	Byte	 0000000D _DATA	
+new_x  . . . . . . . . . . . . .	DWord	 0000002B _DATA	
+new_y  . . . . . . . . . . . . .	DWord	 0000002F _DATA	
+
+	   0 Warnings
+	   0 Errors
